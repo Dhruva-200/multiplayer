@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ShooterCharacter.h"
+#include "Charecter/ShooterCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 // Sets default values
@@ -15,6 +15,7 @@ AShooterCharacter::AShooterCharacter()
 	SpringArm->TargetArmLength = 0.f;
 	SpringArm->bUsePawnControlRotation = true;
 	SpringArm->bEnableCameraLag = true;
+	//this looks so neat btw what the fuck 
 	SpringArm->CameraLagSpeed = 10.f;
 
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>("FirstPersonCamera");
