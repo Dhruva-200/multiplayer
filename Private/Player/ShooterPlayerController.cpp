@@ -38,6 +38,7 @@ void AShooterPlayerController::SetupInputComponent()
 	ShooterInputComponent->BindAction(LookAction,ETriggerEvent::Triggered,this,&ThisClass::Input_Look);
 	ShooterInputComponent->BindAction(JumpAction,ETriggerEvent::Started,this,&ThisClass::Input_Jump);
 	ShooterInputComponent->BindAction(CrouchAction,ETriggerEvent::Started,this,&ThisClass::Input_Crouch);
+	ShooterInputComponent->BindAction(SlideAction,ETriggerEvent::Started,this,&ThisClass::Input_Slide);
 
 }
 
@@ -87,6 +88,35 @@ void AShooterPlayerController::Input_Look(const FInputActionValue& InputActionVa
 	AddYawInput(InputAxisVector.X);
 	AddPitchInput(InputAxisVector.Y);
 	
-	
+}
+
+void AShooterPlayerController::Input_Slide()
+{
+	ACharacter* PlayerCharacter = GetCharacter();
+
+	if (!IsValid(PlayerCharacter))
+	{
+		return;
+	}
+
+	UCharacterMovementComponent* CMC =
+		PlayerCharacter->GetCharacterMovement();
+
+	if (!IsValid(CMC))
+	{
+		return;
+	}
+
+	CMC->bWantsToCrouch = true;
+
+	PlayerCharacter->LaunchCharacter(
+		PlayerCharacter->GetActorForwardVector() * 1500.f,
+		false,
+		false
+	);
+	if (IsValid(CrouchAnimMontage))
+	{
+		PlayerCharacter->PlayAnimMontage(CrouchAnimMontage);
+	}
 	
 }

@@ -2,8 +2,11 @@
 
 
 #include "Charecter/ShooterCharacter.h"
+
+#include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Combact/CombactComponent.h"
 // Sets default values
 AShooterCharacter::AShooterCharacter()
 {
@@ -36,9 +39,10 @@ AShooterCharacter::AShooterCharacter()
 	GetMesh()->bOnlyOwnerSee = false;
 	GetMesh()->bOwnerNoSee = true;
 	GetMesh()->bReceivesDecals = true;
-
-		
-
+	
+	Combact = CreateDefaultSubobject<UCombactComponent>("Combact");
+	Combact->SetIsReplicated(true);
+	
 }
 
 // Called when the game starts or when spawned
@@ -62,6 +66,44 @@ void AShooterCharacter::Tick(float DeltaTime)
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+	UEnhancedInputComponent* ShooterInputComponent= CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	ShooterInputComponent->BindAction(CycleWeapon,ETriggerEvent::Started,this,&ThisClass::Input_Cycle_Weapon);
+	ShooterInputComponent->BindAction(ReloadWeapon,ETriggerEvent::Started,this,&ThisClass::Input_Reload_Weapon);
+	ShooterInputComponent->BindAction(FireWeapon,ETriggerEvent::Started,this,&ThisClass::Input_Fire_Weapon_Pressed);
+	ShooterInputComponent->BindAction(FireWeapon,ETriggerEvent::Completed,this,&ThisClass::Input_Fire_Weapon_Released);
+	ShooterInputComponent->BindAction(AimWeapon,ETriggerEvent::Started,this,&ThisClass::Input_Aim_Weapon_Pressed);
+	ShooterInputComponent->BindAction(AimWeapon,ETriggerEvent::Completed,this,&ThisClass::Input_Aim_Weapon_Released);
 
+}
+
+void AShooterCharacter::Input_Cycle_Weapon()
+{
+	Combact->Initiate_CycleWeapon();
+}
+
+void AShooterCharacter::Input_Reload_Weapon()
+{
+	Combact->Initiate_Reload();
+}
+
+void AShooterCharacter::Input_Fire_Weapon_Pressed()
+{
+	Combact->Initiate_FireWeapon_Pressed();
+}
+
+void AShooterCharacter::Input_Fire_Weapon_Released()
+{
+	Combact->Initiate_FireWeapon_Released();
+}
+
+void AShooterCharacter::Input_Aim_Weapon_Pressed()
+{
+	Combact->Initiate_Aim_Pressed();
+}
+
+void AShooterCharacter::Input_Aim_Weapon_Released()
+{
+	Combact->Initiate_Aim_Released();
 }
 

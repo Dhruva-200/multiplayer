@@ -8,6 +8,7 @@
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
+class UAnimMontage;
 /**
  * 
  */
@@ -39,8 +40,17 @@ private:
 	UPROPERTY(EditAnywhere,Category="FPS|Input")
 	TObjectPtr<UInputAction> CrouchAction;
 	
+	UPROPERTY(EditAnywhere, Category="FPS|Input")
+	TObjectPtr<UInputAction> SlideAction;
+	
+	
 	void Input_Crouch();
 	void Input_Jump();
 	void Input_Move(const FInputActionValue& Handle);
 	void Input_Look(const FInputActionValue& Handle);
+	void Input_Slide();
+	
+	//Animations
+	UPROPERTY(EditAnywhere,Category="FPS|Input")
+	TObjectPtr<UAnimMontage> CrouchAnimMontage;
 };
