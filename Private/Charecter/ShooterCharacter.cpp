@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Combact/CombactComponent.h"
+#include "Data/WeaponData.h"
 // Sets default values
 AShooterCharacter::AShooterCharacter()
 {
@@ -45,6 +46,36 @@ AShooterCharacter::AShooterCharacter()
 	
 }
 
+/*
+// Multiplayer slide implementation (currently disabled).
+void AShooterCharacter::RequestSlide()
+{
+	if (HasAuthority())
+	{
+		ServerStartSlide();
+		return;
+	}
+
+	ServerStartSlide();
+}
+
+void AShooterCharacter::ServerStartSlide_Implementation()
+{
+	// The server owns the movement result, which CharacterMovement replicates to all clients.
+	Crouch();
+	LaunchCharacter(GetActorForwardVector() * 1500.f, false, false);
+	MulticastPlaySlideMontage();
+}
+
+void AShooterCharacter::MulticastPlaySlideMontage_Implementation()
+{
+	if (IsValid(SlideAnimMontage))
+	{
+		PlayAnimMontage(SlideAnimMontage);
+	}
+}
+*/
+
 // Called when the game starts or when spawned
 void AShooterCharacter::BeginPlay()
 {
@@ -55,10 +86,40 @@ void AShooterCharacter::BeginPlay()
 	
 }
 
+FName AShooterCharacter::GetWeaponAttachmentPoint_Implementation(const FGameplayTag& WeaponType) const
+{
+	if (!IsValid(Combact) || !IsValid(Combact->WeaponData))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s has no WeaponData asset configured."), *GetNameSafe(this));
+		return NAME_None;
+	}
+
+	const FName* AttachmentPoint = Combact->WeaponData->GripPoints.Find(WeaponType);
+	if (AttachmentPoint == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s has no grip point configured for weapon type '%s'."),
+			*GetNameSafe(this), *WeaponType.ToString());
+		return NAME_None;
+	}
+
+	return *AttachmentPoint;
+}
+
+USkeletalMeshComponent* AShooterCharacter::GetMesh1P_Implementation() const
+{
+	return Mesh1P;
+}
+
+USkeletalMeshComponent* AShooterCharacter::GetMesh3P_Implementation() const
+{
+	return GetMesh();
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 
 }
 
@@ -75,6 +136,15 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	ShooterInputComponent->BindAction(AimWeapon,ETriggerEvent::Started,this,&ThisClass::Input_Aim_Weapon_Pressed);
 	ShooterInputComponent->BindAction(AimWeapon,ETriggerEvent::Completed,this,&ThisClass::Input_Aim_Weapon_Released);
 
+}
+
+void AShooterCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	if (IsValid(Combact))
+	{
+		Combact->SpawnInventory();
+	}
 }
 
 void AShooterCharacter::Input_Cycle_Weapon()

@@ -3,6 +3,9 @@
 
 #include "Combact/CombactComponent.h"
 
+#include "Charecter/ShooterCharacter.h"
+#include "Weapon/Weapon.h"
+
 
 UCombactComponent::UCombactComponent()
 {
@@ -66,4 +69,35 @@ void UCombactComponent::Initiate_Aim_Released()
 	}
 	
 }
+
+void UCombactComponent::SpawnInventory()
+{
+	if (AWeapon* NewWeapon = SpawnWeapon(DefaultWeaponn))
+	if (IsValid(NewWeapon))
+	{
+		NewWeapon->AttachToOwingPawn();
+	}
+}
+
+void UCombactComponent::DistoryInventory()
+{
+	//
+}
+
+AWeapon* UCombactComponent::SpawnWeapon(TSubclassOf<AWeapon> WeaponClass) const
+{
+	AActor* Owner=GetOwner();
+	if (!IsValid(Owner))return nullptr;// player1 start act as a server listen server
+	if (Owner->GetLocalRole()< ROLE_Authority) return nullptr;
+	//authority -this machine is allowed to make gameplay decisions for this actor 
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator =Cast<APawn>(Owner);//instigator is the actor who spawned IE PLAYER HERE  
+	SpawnInfo.Owner = Owner;//what type of owner -is it a dog player a door or anything 
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	return GetWorld()->SpawnActor<AWeapon>(WeaponClass,SpawnInfo);
+	//SpawnActor creates an instance of the BP_Pistol class and returns a pointer to it as an AWeapon*
+	
+}
+
 

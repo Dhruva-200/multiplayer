@@ -15,14 +15,16 @@ class FPS_API AWeapon : public AActor
 public:
 	// Sets default values for this actor's properties
 	AWeapon();
+	virtual void OnRep_Instigator() override;
 	USkeletalMeshComponent* GetMesh1P() const;
 	USkeletalMeshComponent* GetMesh3P() const;
 	
+	void AttachToOwingPawn() const;
 
 protected:
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(VisibleAnywhere,Category="FPS| WeaponType")
+	UPROPERTY(EditAnywhere,Category="FPS| WeaponType")
 	FGameplayTag WeaponType;
 	
 private:

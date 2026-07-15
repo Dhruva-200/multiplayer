@@ -92,6 +92,7 @@ void AShooterPlayerController::Input_Look(const FInputActionValue& InputActionVa
 
 void AShooterPlayerController::Input_Slide()
 {
+	
 	ACharacter* PlayerCharacter = GetCharacter();
 
 	if (!IsValid(PlayerCharacter))
@@ -118,5 +119,4 @@ void AShooterPlayerController::Input_Slide()
 	{
 		PlayerCharacter->PlayAnimMontage(CrouchAnimMontage);
 	}
-	
 }
